@@ -9,14 +9,7 @@ class Calculator extends Widget {
     this.sizeX = 1.25;
     this.sizeY = 1.75;
     this.header = true;
-
   }
-
-  async ready() {
-    super.ready();
-    this.controller.load();
-  }
-
 }
 
 class CalculatorModel extends WidgetModel {
@@ -61,11 +54,11 @@ class CalculatorModel extends WidgetModel {
     return r;
   }
 
-  isNumber(a) {
+  usedForNumber(a) {
     return a == parseFloat(a) || a === "." || a === "-";
   }
 
-  exprToList(expr) {
+  parseExpr(expr) {
     let t = [""],
       index = 0, // number
       wasNumber = false, // last charater was a number
@@ -81,7 +74,7 @@ class CalculatorModel extends WidgetModel {
       if (!wasNumber && i > 0) {
         next();
       }
-      if (this.isNumber(char)) {
+      if (this.usedForNumber(char)) {
         t[index] += char;
         wasNumber = true;
         if (char === ".");
@@ -93,7 +86,7 @@ class CalculatorModel extends WidgetModel {
     }
     //Convert number from Sring to float
     for (let i = 0; i < t.length; i++) {
-      if (this.isNumber(t[i])) t[i] = parseFloat(t[i]);
+      if (this.usedForNumber(t[i])) t[i] = parseFloat(t[i]);
     }
     //Remove any unExpected char from the list
     let isSign = x => ["+", "/", "*", "−"].includes(x);
@@ -108,7 +101,7 @@ class CalculatorModel extends WidgetModel {
     return t;
   }
 
-  evaluate(lst) {
+  calculate(lst) {
     let copy = lst;
     if (copy.length == 4) {
       //return error("SyntaxError");
@@ -186,7 +179,7 @@ class CalculatorModel extends WidgetModel {
     return copy[1];
   }
 
-  calculate(arg, lst) {
+  evaluate(arg, lst) {
     if (typeof lst == "string") {
       arg.h.textContent = lst;
       return;
@@ -211,19 +204,19 @@ class CalculatorModel extends WidgetModel {
       if (typeof par == "string") return par;
       let a = par[0][0],
         b = par[0][1];
-      copy.splice(a, b - a + 1, this.evaluate(copy.slice(a, b + 1)))
+      copy.splice(a, b - a + 1, this.calculate(copy.slice(a, b + 1)))
     }
     return copy[0];
   }
 
-  result(arg) {
+  getResult(arg) {
     if (this.errored) {
       arg.h.textContent = "";
       this.errored = false;
     } else {
       this.history.push(arg.h.textContent)
-      let lst = this.exprToList(arg.h.textContent);
-      let a = this.calculate(arg, lst);
+      let lst = this.parseExpr(arg.h.textContent);
+      let a = this.evaluate(arg, lst);
       if (!isNaN(a)) {
         this.history.push(a.toString());
         arg.h.textContent = a;
@@ -231,6 +224,16 @@ class CalculatorModel extends WidgetModel {
       else a = error("SyntaxError");
     }
     this.hIndex = this.history.length - 1;
+  }
+
+  memoryAdd(val) {
+    let a = this.evaluate(null, this.parseExpr(val));
+    if (!isNaN(a)) this.memory += a;
+  }
+
+  memorySub(val) {
+    let a = this.evaluate(null, this.parseExpr(val));
+    if (!isNaN(a)) this.memory -= a;
   }
 }
 
@@ -248,17 +251,16 @@ class CalculatorView extends WidgetView {
   draw() {
     super.draw();
     this.h = HH.create("div");
-
     SS.style(this.h, {
       "float": "left",
       "width": "100%",
       "height": "50px",
       "backgroundColor": "white",
-      "fontSize": "20px",
-      "lineHeight": "100%"
-    });
-
-    this.nextLine();
+      "fontSize": "16px",
+      "lineHeight": "250%",
+      "overflow-y": "hidden",
+      "overflow-x": "auto"
+    });;
     this.stage.appendChild(this.h);
     this.addButton('mc', event => (this.memoryClear(this)));
     this.addButton('m+', event => (this.memoryAdd(this)));
@@ -297,7 +299,6 @@ class CalculatorView extends WidgetView {
 
   showButton() {
     for (let i = 0; i < this.buttons.length; i++) {
-      if (i % 3 == 0) this.nextLine();
       this.stage.appendChild(this.buttons[i]);
     }
   }
@@ -305,9 +306,7 @@ class CalculatorView extends WidgetView {
   addButton(name, func, val) {
     let b = HH.create("div");
     b.textContent = name;
-    b.addEventListener('click', function(event) {
-      func(event, val);
-    });
+    b.addEventListener('click', event => func(event, val));
     SS.style(b, {
       "fontSize": "20px",
       "textDecoration": "none",
@@ -316,9 +315,14 @@ class CalculatorView extends WidgetView {
       "float": "left",
       "textAlign": "center",
       "hover": "#505050",
-      "cursor": "pointer"
+      "cursor": "pointer",
+      "scrollbar-height": null
     });
     this.buttons.push(b);
+  }
+
+  errored() {
+    return this.mvc.controller.errored();
   }
 
   addEmpty() {
@@ -331,40 +335,55 @@ class CalculatorView extends WidgetView {
     this.buttons.push(b);
   }
 
+  // using model
   add(event, arg) {
-    if (arg[0].mvc.model.errored) {
+    if (arg[0].errored()) {
       arg[0].h.textContent = arg[1]
       arg[0].mvc.model.errored = false;
     } else arg[0].h.textContent += arg[1];
     arg[0].mvc.model.hIndex = arg[0].mvc.model.history.length;
+    arg[0].h.scrollTo(arg[0].h.textContent.length * 20, 0);
   }
 
-  nextLine() {
-    //let b = document.createElement("br");
-    //this.stage.appendChild(b);
-    //b = document.createElement("br");
-    //this.stage.appendChild(b);
-  }
   // delete one character
   del(arg) {
-    if (arg.mvc.model.errored) arg.h.textContent = "";
+    if (arg.errored()) arg.h.textContent = "";
     let res = "";
     for (let i = 0; i < arg.h.textContent.length - 1; res += arg.h.textContent[i], i++); {}
     arg.h.textContent = res;
   }
+
   // delete all character
   rm(arg) {
     arg.h.textContent = "";
     this.mvc.controller.setIndex(arg.mvc.model.history.length);
   }
 
+  //request getResult from controller
   calc(arg) {
-    this.mvc.controller.result(arg);
+    this.mvc.controller.getResult(arg);
   }
 
   updateIndex(w) {
     this.mvc.controller.updateHIndex(w)
   }
+
+  memoryClear(arg) {
+    arg.mvc.controller.memoryClear(arg);
+  }
+
+  memoryAdd(arg) {
+    arg.mvc.controller.memoryAdd(arg);
+  }
+
+  memorySub(arg) {
+    arg.mvc.controller.memorySub(arg);
+  }
+
+  memoryShow(arg) {
+    arg.mvc.controller.memoryShow(arg);
+  }
+
 }
 
 class CalculatorController extends WidgetController {
@@ -385,8 +404,8 @@ class CalculatorController extends WidgetController {
     return this.mvc.view.h;
   }
 
-  result(arg) {
-    return this.mvc.model.result(arg);
+  getResult(arg) {
+    return this.mvc.model.getResult(arg);
   }
 
   setIndex(w) {
@@ -400,7 +419,23 @@ class CalculatorController extends WidgetController {
     this.setField(this.mvc.model.history[this.mvc.model.hIndex]);
   }
 
-  async load() {
+  errored() {
+    return this.mvc.model.errored;
+  }
 
+  memoryClear() {
+    this.mvc.model.memory = 0;
+  }
+
+  memoryAdd(arg) {
+    this.mvc.model.memoryAdd(arg.h.textContent);
+  }
+
+  memorySub(arg) {
+    this.mvc.model.memorySub(arg.h.textContent);
+  }
+
+  memoryShow() {
+    this.setField(this.mvc.model.memory);
   }
 }
