@@ -178,7 +178,7 @@ class CalculatorModel extends WidgetModel {
   // Apply the calculation function using the correct order of operation
   evaluate(arg, lst) {
     if (typeof lst == "string") {
-      arg.h.textContent = lst;
+      arg.display.textContent = lst;
       return;
     }
     let copy = lst,
@@ -208,16 +208,16 @@ class CalculatorModel extends WidgetModel {
   // query result
   getResult(arg) {
     if (this.errored) {
-      arg.h.textContent = "";
+      arg.display.textContent = "";
       this.errored = false;
     } else {
-      this.history.push(arg.h.textContent)
-      let lst = this.parseExpr(arg.h.textContent);
+      this.history.push(arg.display.textContent)
+      let lst = this.parseExpr(arg.display.textContent);
       let a = this.evaluate(arg, lst);
       if (!isNaN(a)) {
         this.history.push(a.toString());
-        arg.h.textContent = a;
-      } else if (typeof a === "string") arg.h.textContent = a;
+        arg.display.textContent = a;
+      } else if (typeof a === "string") arg.display.textContent = a;
       else a = error("SyntaxError");
     }
     this.hIndex = this.history.length - 1;
@@ -301,7 +301,6 @@ class CalculatorView extends WidgetView {
   }
   // Add button to list
   buttonFactory(name, func, val, dim = [1, 1]) {
-    console.log(name, val, dim)
     let b = HH.create("div");
     b.textContent = name;
     b.addEventListener("click", event => func(event, val));
@@ -324,23 +323,23 @@ class CalculatorView extends WidgetView {
   // Request Error state before adding character
   add(event, arg) {
     if (arg[0].errored()) {
-      arg[0].h.textContent = arg[1]
+      arg[0].display.textContent = arg[1]
       arg[0].mvc.controller.setError(false);
-    } else arg[0].h.textContent += arg[1];
+    } else arg[0].display.textContent += arg[1];
     arg[0].mvc.controller.setIndex();
-    arg[0].h.scrollTo(arg[0].h.textContent.length * 20, 0);
+    arg[0].display.scrollTo(arg[0].display.textContent.length * 20, 0);
   }
   // Delete last character
   del(arg) {
-    if (arg.errored()) arg.h.textContent = "";
+    if (arg.errored()) arg.display.textContent = "";
     let res = "";
-    for (let i = 0; i < arg.h.textContent.length - 1; res += arg.h.textContent[i], i++); {}
-    arg.h.textContent = res;
+    for (let i = 0; i < arg.display.textContent.length - 1; res += arg.display.textContent[i], i++); {}
+    arg.display.textContent = res;
     this.mvc.controller.setIndex();
   }
   // Delete all character
   rm(arg) {
-    arg.h.textContent = "";
+    arg.display.textContent = "";
     this.mvc.controller.setIndex();
   }
   // Request result from controller
@@ -380,7 +379,7 @@ class CalculatorController extends WidgetController {
   }
   // Update view
   setField(val) {
-    this.mvc.view.h.textContent = val;
+    this.mvc.view.display.textContent = val;
   }
   // Request result from model
   getResult(arg) {
@@ -411,11 +410,11 @@ class CalculatorController extends WidgetController {
   }
   // Request a memory addition from model
   memoryAdd(arg) {
-    this.mvc.model.memoryAdd(arg.h.textContent);
+    this.mvc.model.memoryAdd(arg.display.textContent);
   }
   // Request a memory subtraction from model
   memorySub(arg) {
-    this.mvc.model.memorySub(arg.h.textContent);
+    this.mvc.model.memorySub(arg.display.textContent);
   }
   // Show memory stored value on display
   memoryShow() {
