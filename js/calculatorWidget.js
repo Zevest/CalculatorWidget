@@ -247,8 +247,8 @@ class CalculatorView extends WidgetView {
 
   draw() {
     super.draw();
-    this.h = HH.create("div");
-    SS.style(this.h, {
+    this.display = HH.create("div");
+    SS.style(this.display, {
       "float": "left",
       "width": "100%",
       "height": "50px",
@@ -259,7 +259,7 @@ class CalculatorView extends WidgetView {
       "overflow-y": "hidden",
       "overflow-x": "auto"
     });
-    this.stage.appendChild(this.h);
+    this.stage.appendChild(this.display);
     this.createAllButton();
     this.showButton();
   }
@@ -323,7 +323,7 @@ class CalculatorView extends WidgetView {
   // Request Error state before adding character
   add(event, arg) {
     if (arg[0].errored()) {
-      arg[0].display.textContent = arg[1]
+      arg[0].display.textContent = arg[1];
       arg[0].mvc.controller.setError(false);
     } else arg[0].display.textContent += arg[1];
     arg[0].mvc.controller.setIndex();
