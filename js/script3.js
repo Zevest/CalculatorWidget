@@ -27,12 +27,12 @@ class CalculatorModel extends WidgetModel {
     super.setUp();
 
   }
-
+  // Return msg and set error state to true
   error(msg) {
     this.errored = true;
     return msg;
   }
-
+  // Get order of queryParenthesis
   queryParenthesis(lst) {
     let r = [];
     let index = [];
@@ -41,7 +41,7 @@ class CalculatorModel extends WidgetModel {
       count[0] = (lst[i] == "(") ? count[0] + 1 : count[0];
       count[1] = (lst[i] == ")") ? count[1] + 1 : count[1];
     }
-    if (count[0] != count[1]) return this.error("SyntaxError : Missing parenthese");
+    if (count[0] != count[1]) return this.error("SyntaxError");
 
     for (let i = 0; i < lst.length; i++) {
       if (lst[i] == "(") {
@@ -53,11 +53,11 @@ class CalculatorModel extends WidgetModel {
     }
     return r;
   }
-
+  // Return true if it a is a number or use to describe a number
   usedForNumber(a) {
     return a == parseFloat(a) || a === "." || a === "-";
   }
-
+  // Convert String expretion into list splitting number symbol of operation
   parseExpr(expr) {
     let t = [""],
       index = 0, // number
@@ -100,12 +100,9 @@ class CalculatorModel extends WidgetModel {
     t.push(")");
     return t;
   }
-
+  // Calculate short expretion
   calculate(lst) {
     let copy = lst;
-    if (copy.length == 4) {
-      //return error("SyntaxError");
-    }
     if (lst[1] === ")") {
       return this.error("SyntaxError: Missing Operation");
     }
@@ -178,7 +175,7 @@ class CalculatorModel extends WidgetModel {
     }
     return copy[1];
   }
-
+  // Apply the calculation function using the correct order of operation
   evaluate(arg, lst) {
     if (typeof lst == "string") {
       arg.h.textContent = lst;
@@ -208,7 +205,7 @@ class CalculatorModel extends WidgetModel {
     }
     return copy[0];
   }
-
+  // query result
   getResult(arg) {
     if (this.errored) {
       arg.h.textContent = "";
@@ -225,12 +222,12 @@ class CalculatorModel extends WidgetModel {
     }
     this.hIndex = this.history.length - 1;
   }
-
+  // Add value to memory
   memoryAdd(val) {
     let a = this.evaluate(null, this.parseExpr(val));
     if (!isNaN(a)) this.memory += a;
   }
-
+  // Subtract value from memory
   memorySub(val) {
     let a = this.evaluate(null, this.parseExpr(val));
     if (!isNaN(a)) this.memory -= a;
@@ -255,54 +252,59 @@ class CalculatorView extends WidgetView {
       "float": "left",
       "width": "100%",
       "height": "50px",
-      "backgroundColor": "white",
+      "backgroundColor": "#ffffff",
+      "border": "1px solide black",
       "fontSize": "16px",
       "lineHeight": "250%",
       "overflow-y": "hidden",
       "overflow-x": "auto"
-    });;
+    });
     this.stage.appendChild(this.h);
-    this.addButton('mc', event => (this.memoryClear(this)), null, [1.25]);
-    this.addButton('m+', event => (this.memoryAdd(this)), null, [1.25]);
-    this.addButton('m-', event => (this.memorySub(this)), null, [1.25]);
-    this.addButton('mr', event => (this.memoryShow(this)), null, [1.25]);
-    this.addButton('AC', event => (this.rm(this)));
-    this.addButton('C', event => (this.del(this)));
-    this.addButton('⬆', event => this.updateIndex(-1));
-    this.addButton('⬇', event => this.updateIndex(1));
-    this.addButton("+", this.add, [this, "+"]);
-    this.addButton(7, this.add, [this, "7"]);
-    this.addButton(8, this.add, [this, "8"]);
-    this.addButton(9, this.add, [this, "9"]);
-    this.addButton("(", this.add, [this, "("]);
-    this.addButton("−", this.add, [this, "−"]);
-    this.addButton(4, this.add, [this, "4"]);
-    this.addButton(5, this.add, [this, "5"]);
-    this.addButton(6, this.add, [this, "6"]);
-    this.addButton(")", this.add, [this, ")"]);
-    this.addButton("÷", this.add, [this, "/"]);
-    this.addButton(1, this.add, [this, "1"]);
-    this.addButton(2, this.add, [this, "2"]);
-    this.addButton(3, this.add, [this, "3"]);
-    this.addButton('(-)', this.add, [this, "-"]);
-    this.addButton("×", this.add, [this, "*"]);
-    this.addButton(0, this.add, [this, "0"], [2, 1]);
-    this.addButton(",", this.add, [this, "."]);
-    this.addButton('=', event => (this.calc(this)), null, [2, 1]);
+    this.createAllButton();
     this.showButton();
   }
-
+  // Create all necessary button
+  createAllButton() {
+    this.buttonFactory('mc', event => (this.memoryClear(this)), null, [1.25]);
+    this.buttonFactory('m+', event => (this.memoryAdd(this)), null, [1.25]);
+    this.buttonFactory('m-', event => (this.memorySub(this)), null, [1.25]);
+    this.buttonFactory('mr', event => (this.memoryShow(this)), null, [1.25]);
+    this.buttonFactory('AC', event => (this.rm(this)));
+    this.buttonFactory('C', event => (this.del(this)));
+    this.buttonFactory('⬆', event => this.updateIndex(-1));
+    this.buttonFactory('⬇', event => this.updateIndex(1));
+    this.buttonFactory("+", this.add, [this, "+"]);
+    this.buttonFactory(7, this.add, [this, "7"]);
+    this.buttonFactory(8, this.add, [this, "8"]);
+    this.buttonFactory(9, this.add, [this, "9"]);
+    this.buttonFactory("(", this.add, [this, "("]);
+    this.buttonFactory("−", this.add, [this, "−"]);
+    this.buttonFactory(4, this.add, [this, "4"]);
+    this.buttonFactory(5, this.add, [this, "5"]);
+    this.buttonFactory(6, this.add, [this, "6"]);
+    this.buttonFactory(")", this.add, [this, ")"]);
+    this.buttonFactory("÷", this.add, [this, "/"]);
+    this.buttonFactory(1, this.add, [this, "1"]);
+    this.buttonFactory(2, this.add, [this, "2"]);
+    this.buttonFactory(3, this.add, [this, "3"]);
+    this.buttonFactory('(-)', this.add, [this, "-"]);
+    this.buttonFactory("×", this.add, [this, "*"]);
+    this.buttonFactory(0, this.add, [this, "0"], [2, 1]);
+    this.buttonFactory(",", this.add, [this, "."]);
+    this.buttonFactory('=', event => (this.calc(this)), null, [2, 1]);
+  }
+  // Add all button from list to stage
   showButton() {
     for (let i = 0; i < this.buttons.length; i++) {
       this.stage.appendChild(this.buttons[i]);
     }
   }
-
-  addButton(name, func, val, dim = [1, 1]) {
+  // Add button to list
+  buttonFactory(name, func, val, dim = [1, 1]) {
     console.log(name, val, dim)
     let b = HH.create("div");
     b.textContent = name;
-    b.addEventListener('click', event => func(event, val));
+    b.addEventListener("click", event => func(event, val));
     SS.style(b, {
       "fontSize": "20px",
       "textDecoration": "none",
@@ -310,27 +312,25 @@ class CalculatorView extends WidgetView {
       "height": "" + 12.5 * dim[1] + "%",
       "float": "left",
       "textAlign": "center",
-      "hover": "#505050",
       "cursor": "pointer",
       "scrollbar-height": null
     });
     this.buttons.push(b);
   }
-
+  // Request error state from controller
   errored() {
     return this.mvc.controller.errored();
   }
-  // using model
+  // Request Error state before adding character
   add(event, arg) {
     if (arg[0].errored()) {
       arg[0].h.textContent = arg[1]
-      arg[0].mvc.model.errored = false;
+      arg[0].mvc.controller.setError(false);
     } else arg[0].h.textContent += arg[1];
-    arg[0].mvc.model.hIndex = arg[0].mvc.model.history.length;
+    arg[0].mvc.controller.setIndex();
     arg[0].h.scrollTo(arg[0].h.textContent.length * 20, 0);
   }
-
-  // delete one character
+  // Delete last character
   del(arg) {
     if (arg.errored()) arg.h.textContent = "";
     let res = "";
@@ -338,38 +338,35 @@ class CalculatorView extends WidgetView {
     arg.h.textContent = res;
     this.mvc.controller.setIndex();
   }
-
-  // delete all character
+  // Delete all character
   rm(arg) {
     arg.h.textContent = "";
     this.mvc.controller.setIndex();
   }
-
-  //request getResult from controller
+  // Request result from controller
   calc(arg) {
     this.mvc.controller.getResult(arg);
   }
-
+  // Request history index update from controller
   updateIndex(w) {
     this.mvc.controller.updateHIndex(w)
   }
-
+  // Request a memory clear from controller
   memoryClear(arg) {
     arg.mvc.controller.memoryClear(arg);
   }
-
+  // Request a memory addition from controller
   memoryAdd(arg) {
     arg.mvc.controller.memoryAdd(arg);
   }
-
+  // Request a memory subtraction from controller
   memorySub(arg) {
     arg.mvc.controller.memorySub(arg);
   }
-
+  // Request a memory stored value
   memoryShow(arg) {
     arg.mvc.controller.memoryShow(arg);
   }
-
 }
 
 class CalculatorController extends WidgetController {
@@ -381,42 +378,46 @@ class CalculatorController extends WidgetController {
   setUp() {
     super.setUp();
   }
-
+  // Update view
   setField(val) {
     this.mvc.view.h.textContent = val;
   }
-
+  // Request result from model
   getResult(arg) {
     return this.mvc.model.getResult(arg);
   }
-
+  // Change history index, set by default to the last index
   setIndex(w = this.mvc.model.history.length) {
     this.mvc.model.hIndex = w;
   }
-
+  // Update history index
   updateHIndex(w) {
     this.mvc.model.hIndex += w;
     this.setIndex((this.mvc.model.hIndex > this.mvc.model.history.length) ? this.mvc.model.history.length : this.mvc.model.hIndex);
     this.mvc.model.hIndex = (this.mvc.model.hIndex < 0) ? 0 : this.mvc.model.hIndex;
     this.setField(this.mvc.model.history[this.mvc.model.hIndex]);
   }
-
+  // Return model's error state
   errored() {
     return this.mvc.model.errored;
   }
-
+  // Set model's error state
+  setError(state) {
+    this.mvc.model.errored = state;
+  }
+  // Clear model's memory by resetting it to 0
   memoryClear() {
     this.mvc.model.memory = 0;
   }
-
+  // Request a memory addition from model
   memoryAdd(arg) {
     this.mvc.model.memoryAdd(arg.h.textContent);
   }
-
+  // Request a memory subtraction from model
   memorySub(arg) {
     this.mvc.model.memorySub(arg.h.textContent);
   }
-
+  // Show memory stored value on display
   memoryShow() {
     this.setField(this.mvc.model.memory);
   }
