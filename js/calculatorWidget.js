@@ -30,6 +30,7 @@ class CalculatorModel extends WidgetModel {
   // Return msg and set error state to true
   error(msg) {
     this.errored = true;
+    console.error(msg);
     return msg;
   }
   // Get order of queryParenthesis
@@ -88,7 +89,7 @@ class CalculatorModel extends WidgetModel {
     for (let i = 0; i < t.length; i++) {
       if (this.usedForNumber(t[i])) t[i] = parseFloat(t[i]);
     }
-    //Remove any unExpected char from the list
+    //Remove any unExpected character from the list
     let isSign = x => ["+", "/", "*", "−"].includes(x);
     if (isNaN(t[0]) && t[0] !== "(" && !isSign(t[0])) t.shift();
     for (let i = t.length - 1; i > 0; i--) {
@@ -96,12 +97,13 @@ class CalculatorModel extends WidgetModel {
         t.splice(i, 1);
       }
     }
-    t.unshift("(");
+    t.unshift("(", 0, "+");
     t.push(")");
     return t;
   }
   // Calculate short expretion
   calculate(lst) {
+    console.log(lst);
     let copy = lst;
     if (lst[1] === ")") {
       return this.error("SyntaxError : CLCP");
@@ -109,10 +111,12 @@ class CalculatorModel extends WidgetModel {
     // division and multiplication
     let y = copy.slice(1, copy.length - 1)
     if (y.includes("(")) {
-      copy[y.indexOf("(") + 1] = "*";
+      let t = indexOf("(");
+      if (!isNaN(copy[t])) copy[t + 1] = "*";
     }
-
+    console.log(y, copy);
     let i = 0;
+    // Multiplication and division
     while (copy.includes("*") || copy.includes("/")) {
       let a = copy.indexOf("*");
       let b = copy.indexOf("/");
@@ -173,6 +177,7 @@ class CalculatorModel extends WidgetModel {
         return this.error("Error: too much operation");
       }
     }
+    console.log(copy);
     return copy[1];
   }
   // Apply the calculation function using the correct order of operation
@@ -324,7 +329,9 @@ class CalculatorView extends WidgetView {
   add(event, arg) {
     if (arg[0].errored()) {
       arg[0].mvc.controller.setError(false);
-    } else arg[0].display.textContent += arg[1];
+      arg[0].display.textContent = "";
+    }
+    arg[0].display.textContent += arg[1];
     arg[0].mvc.controller.setIndex();
     arg[0].display.scrollTo(arg[0].display.textContent.length * 20, 0);
   }
