@@ -262,38 +262,33 @@ class CalculatorView extends WidgetView {
       "overflow-x": "auto"
     });;
     this.stage.appendChild(this.h);
-    this.addButton('mc', event => (this.memoryClear(this)));
-    this.addButton('m+', event => (this.memoryAdd(this)));
-    this.addButton('m-', event => (this.memorySub(this)));
-    this.addButton('mr', event => (this.memoryShow(this)));
+    this.addButton('mc', event => (this.memoryClear(this)), null, [1.25]);
+    this.addButton('m+', event => (this.memoryAdd(this)), null, [1.25]);
+    this.addButton('m-', event => (this.memorySub(this)), null, [1.25]);
+    this.addButton('mr', event => (this.memoryShow(this)), null, [1.25]);
+    this.addButton('AC', event => (this.rm(this)));
+    this.addButton('C', event => (this.del(this)));
     this.addButton('⬆', event => this.updateIndex(-1));
-    this.addEmpty();
-    this.addButton('c', event => (this.rm(this)));
-    this.addButton('del', event => (this.del(this)));
-    this.addButton('(-)', this.add, [this, "-"]);
     this.addButton('⬇', event => this.updateIndex(1));
-    this.addEmpty();
+    this.addButton("+", this.add, [this, "+"]);
     this.addButton(7, this.add, [this, "7"]);
     this.addButton(8, this.add, [this, "8"]);
     this.addButton(9, this.add, [this, "9"]);
-    this.addButton("+", this.add, [this, "+"]);
-    this.addEmpty();
-
+    this.addButton("(", this.add, [this, "("]);
+    this.addButton("−", this.add, [this, "−"]);
     this.addButton(4, this.add, [this, "4"]);
     this.addButton(5, this.add, [this, "5"]);
     this.addButton(6, this.add, [this, "6"]);
-    this.addButton("−", this.add, [this, "−"]);
-    this.addEmpty();
+    this.addButton(")", this.add, [this, ")"]);
+    this.addButton("÷", this.add, [this, "/"]);
     this.addButton(1, this.add, [this, "1"]);
     this.addButton(2, this.add, [this, "2"]);
     this.addButton(3, this.add, [this, "3"]);
+    this.addButton('(-)', this.add, [this, "-"]);
     this.addButton("×", this.add, [this, "*"]);
-    this.addButton("(", this.add, [this, "("]);
-    this.addButton(")", this.add, [this, ")"]);
-    this.addButton(0, this.add, [this, "0"]);
+    this.addButton(0, this.add, [this, "0"], [2, 1]);
     this.addButton(",", this.add, [this, "."]);
-    this.addButton('=', event => (this.calc(this)));
-    this.addButton("÷", this.add, [this, "/"]);
+    this.addButton('=', event => (this.calc(this)), null, [2, 1]);
     this.showButton();
   }
 
@@ -303,15 +298,16 @@ class CalculatorView extends WidgetView {
     }
   }
 
-  addButton(name, func, val) {
+  addButton(name, func, val, dim = [1, 1]) {
+    console.log(name, val, dim)
     let b = HH.create("div");
     b.textContent = name;
     b.addEventListener('click', event => func(event, val));
     SS.style(b, {
       "fontSize": "20px",
       "textDecoration": "none",
-      "width": "20%",
-      "height": "30px",
+      "width": "" + 20 * dim[0] + "%",
+      "height": "" + 12.5 * dim[1] + "%",
       "float": "left",
       "textAlign": "center",
       "hover": "#505050",
@@ -324,17 +320,6 @@ class CalculatorView extends WidgetView {
   errored() {
     return this.mvc.controller.errored();
   }
-
-  addEmpty() {
-    let b = HH.create("div");
-    SS.style(b, {
-      "width": "20%",
-      "height": "30px",
-      "float": "left",
-    });
-    this.buttons.push(b);
-  }
-
   // using model
   add(event, arg) {
     if (arg[0].errored()) {
@@ -351,12 +336,13 @@ class CalculatorView extends WidgetView {
     let res = "";
     for (let i = 0; i < arg.h.textContent.length - 1; res += arg.h.textContent[i], i++); {}
     arg.h.textContent = res;
+    this.mvc.controller.setIndex();
   }
 
   // delete all character
   rm(arg) {
     arg.h.textContent = "";
-    this.mvc.controller.setIndex(arg.mvc.model.history.length);
+    this.mvc.controller.setIndex();
   }
 
   //request getResult from controller
@@ -400,15 +386,11 @@ class CalculatorController extends WidgetController {
     this.mvc.view.h.textContent = val;
   }
 
-  getVal() {
-    return this.mvc.view.h;
-  }
-
   getResult(arg) {
     return this.mvc.model.getResult(arg);
   }
 
-  setIndex(w) {
+  setIndex(w = this.mvc.model.history.length) {
     this.mvc.model.hIndex = w;
   }
 
