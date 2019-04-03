@@ -4,7 +4,7 @@ class Main {
 	
 	constructor() {
 		this._name = "dash";
-		let widget = new LeMondeWidget(1, this);
+		let widget = new Calculator(1, this);
 		document.body.appendChild(widget.view.stage);
 	}
 	
