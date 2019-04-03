@@ -323,7 +323,11 @@ class CalculatorView extends WidgetView {
   // Request Error state before adding character
   add(event, arg) {
     if (arg[0].errored()) {
+<<<<<<< HEAD:js/calculatorWidget.js
       arg[0].display.textContent = arg[1];
+=======
+      arg[0].display.textContent = arg[1]
+>>>>>>> 0682fde30eeebef75a724ce4a0c18f679d7fdfb9:js/calculatorWidget.js
       arg[0].mvc.controller.setError(false);
     } else arg[0].display.textContent += arg[1];
     arg[0].mvc.controller.setIndex();
