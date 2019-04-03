@@ -41,7 +41,7 @@ class CalculatorModel extends WidgetModel {
       count[0] = (lst[i] == "(") ? count[0] + 1 : count[0];
       count[1] = (lst[i] == ")") ? count[1] + 1 : count[1];
     }
-    if (count[0] != count[1]) return this.error("SyntaxError");
+    if (count[0] != count[1]) return this.error("SyntaxError : QP");
 
     for (let i = 0; i < lst.length; i++) {
       if (lst[i] == "(") {
@@ -104,7 +104,7 @@ class CalculatorModel extends WidgetModel {
   calculate(lst) {
     let copy = lst;
     if (lst[1] === ")") {
-      return this.error("SyntaxError: Missing Operation");
+      return this.error("SyntaxError : CLCP");
     }
     // division and multiplication
     let y = copy.slice(1, copy.length - 1)
@@ -118,12 +118,12 @@ class CalculatorModel extends WidgetModel {
       let b = copy.indexOf("/");
       if (a > 0) {
         if (isNaN(copy[a - 1]) || isNaN(copy[a + 1])) {
-          return this.error("SyntaxError");
+          return this.error("SyntaxError : CLCM");
         }
       }
       if (b > 0) {
         if (isNaN(copy[b - 1]) || isNaN(copy[b + 1])) {
-          return this.error("SyntaxError");
+          return this.error("SyntaxError : CLCD");
         }
       }
       if (a >= 1 && b >= 1) {
@@ -149,12 +149,12 @@ class CalculatorModel extends WidgetModel {
       let b = copy.indexOf("−");
       if (a > 0) {
         if (isNaN(copy[a - 1]) || isNaN(copy[a + 1])) {
-          return this.error("SyntaxError");
+          return this.error("SyntaxError : CLCA");
         }
       }
       if (b > 0) {
         if (isNaN(copy[b - 1]) || isNaN(copy[b + 1])) {
-          return this.error("SyntaxError");
+          return this.error("SyntaxError CLCS");
         }
       }
       if (a >= 1 && b >= 1) {
@@ -218,7 +218,7 @@ class CalculatorModel extends WidgetModel {
         this.history.push(a.toString());
         arg.display.textContent = a;
       } else if (typeof a === "string") arg.display.textContent = a;
-      else a = error("SyntaxError");
+      else a = error("SyntaxError : GR");
     }
     this.hIndex = this.history.length - 1;
   }
