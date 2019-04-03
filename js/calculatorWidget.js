@@ -97,7 +97,7 @@ class CalculatorModel extends WidgetModel {
         t.splice(i, 1);
       }
     }
-    t.unshift("(", 0, "+");
+    t.unshift("(");
     t.push(")");
     return t;
   }
@@ -108,13 +108,7 @@ class CalculatorModel extends WidgetModel {
     if (lst[1] === ")") {
       return this.error("SyntaxError : CLCP");
     }
-    // division and multiplication
-    let y = copy.slice(1, copy.length - 1)
-    if (y.includes("(")) {
-      let t = indexOf("(");
-      if (!isNaN(copy[t])) copy[t + 1] = "*";
-    }
-    console.log(y, copy);
+
     let i = 0;
     // Multiplication and division
     while (copy.includes("*") || copy.includes("/")) {
@@ -191,8 +185,14 @@ class CalculatorModel extends WidgetModel {
 
     while (i < copy.length) {
       if (copy[i] == "(") {
-        if (!(copy[i - 1] == "+" || copy[i - 1] == "-" || copy[i - 1] == "*" || copy[i - 1] == "/")) {
+        if (!(copy[i - 1] == "+" || copy[i - 1] == "-" || copy[i - 1] == "*" || copy[i - 1] == "/" || copy[i - 1] == "(")) {
           copy.splice(i, 0, "*");
+          i++;
+        }
+      }
+      if (copy[i] == ")") {
+        if (!(copy[i + 1] == "+" || copy[i + 1] == "-" || copy[i + 1] == "*" || copy[i + 1] == "/" || copy[i + 1] == ")")) {
+          copy.splice(i + 1, 0, "*");
           i++;
         }
       }
