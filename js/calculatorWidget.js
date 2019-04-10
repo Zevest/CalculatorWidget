@@ -103,6 +103,7 @@ class CalculatorModel extends WidgetModel {
   }
   // Calculate short expretion
   calculate(lst) {
+  	let flottant = 10
     console.log(lst);
     let copy = lst;
     if (lst[1] === ")") {
@@ -126,14 +127,14 @@ class CalculatorModel extends WidgetModel {
       }
       if (a >= 1 && b >= 1) {
         if (a > b) {
-          copy.splice(b - 1, 3, this.fix(10, lst[b - 1] / lst[b + 1]));
+          copy.splice(b - 1, 3, this.fix(floattant, lst[b - 1] / lst[b + 1]));
         } else {
-          copy.splice(a - 1, 3, this.fix(10, lst[a - 1] * lst[a + 1]));
+          copy.splice(a - 1, 3, this.fix(floattant, lst[a - 1] * lst[a + 1]));
         }
       } else if (a >= 1) {
-        copy.splice(a - 1, 3, this.fix(10, lst[a - 1] * lst[a + 1]));
+        copy.splice(a - 1, 3, this.fix(floattant, lst[a - 1] * lst[a + 1]));
       } else if (b >= 1) {
-        copy.splice(b - 1, 3, this.fix(10, lst[b - 1] / lst[b + 1]));
+        copy.splice(b - 1, 3, this.fix(floattant, lst[b - 1] / lst[b + 1]));
       }
       i++;
       if (i > this.numberMax) {
@@ -157,14 +158,14 @@ class CalculatorModel extends WidgetModel {
       }
       if (a >= 1 && b >= 1) {
         if (a > b) {
-          copy.splice(b - 1, 3, this.fix(10, lst[b - 1] - lst[b + 1]));
+          copy.splice(b - 1, 3, this.fix(floattant, lst[b - 1] - lst[b + 1]));
         } else {
-          copy.splice(a - 1, 3, this.fix(10, lst[a - 1] + lst[a + 1]));
+          copy.splice(a - 1, 3, this.fix(floattant, lst[a - 1] + lst[a + 1]));
         }
       } else if (a >= 1) {
-        copy.splice(a - 1, 3, this.fix(10, lst[a - 1] + lst[a + 1]));
+        copy.splice(a - 1, 3, this.fix(floattant, lst[a - 1] + lst[a + 1]));
       } else if (b >= 1) {
-        copy.splice(b - 1, 3, this.fix(10, lst[b - 1] - lst[b + 1]));
+        copy.splice(b - 1, 3, this.fix(floattant, lst[b - 1] - lst[b + 1]));
       }
       i++;
       if (i > this.numberMax) {
