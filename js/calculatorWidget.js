@@ -196,6 +196,14 @@ class CalculatorModel extends WidgetModel {
           i++;
         }
       }
+	  if(copy[i] == "%" && i > 1){
+  	    if (!(copy[i + 1] == "+" || copy[i + 1] == "-" || copy[i + 1] == "*" || copy[i + 1] == "/" || copy[i + 1] == ")")) {
+      	   copy.splice(i, 1, "/"); 
+      	   copy.splice(i+1, 0, 100);
+      	   copy.splice(i+2, 0, "*");
+      	   i+=3;
+        }
+      }
       i++;
     }
 
@@ -206,17 +214,24 @@ class CalculatorModel extends WidgetModel {
       if (typeof par == "string") return par;
       let a = par[0][0],
         b = par[0][1];
-      copy.splice(a, b - a + 1, this.calculate(copy.slice(a, b + 1)))
+      copy.splice(a, b - a + 1, this.fix(10,this.calculate(copy.slice(a, b + 1))));
     }
     return copy[0];
   }
   // query result
+  fix(n, val){
+  	let t = Math.pow(10,n);
+  	let res = val * t;
+  	res = Math.round(res);
+  	return res/t;
+  	
+  }
   getResult(arg) {
     if (this.errored) {
       arg.display.textContent = "";
       this.errored = false;
     } else {
-      this.history.push(arg.display.textContent)
+      this.history.push(arg.display.textContent);
       let lst = this.parseExpr(arg.display.textContent);
       let a = this.evaluate(arg, lst);
       if (!isNaN(a)) {
@@ -282,12 +297,13 @@ class CalculatorView extends WidgetView {
     this.buttonFactory(7, this.add, [this, "7"]);
     this.buttonFactory(8, this.add, [this, "8"]);
     this.buttonFactory(9, this.add, [this, "9"]);
-    this.buttonFactory("(", this.add, [this, "("]);
+    this.buttonFactory("(", this.add, [this, "("], [0.5]);
+    this.buttonFactory(")", this.add, [this, ")"], [0.5]);
     this.buttonFactory("−", this.add, [this, "−"]);
     this.buttonFactory(4, this.add, [this, "4"]);
     this.buttonFactory(5, this.add, [this, "5"]);
     this.buttonFactory(6, this.add, [this, "6"]);
-    this.buttonFactory(")", this.add, [this, ")"]);
+    this.buttonFactory("%", this.add, [this, "%"]);
     this.buttonFactory("÷", this.add, [this, "/"]);
     this.buttonFactory(1, this.add, [this, "1"]);
     this.buttonFactory(2, this.add, [this, "2"]);
