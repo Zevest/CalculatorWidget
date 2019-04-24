@@ -127,14 +127,14 @@ class CalculatorModel extends WidgetModel {
       }
       if (a >= 1 && b >= 1) {
         if (a > b) {
-          copy.splice(b - 1, 3, this.fix(floattant, lst[b - 1] / lst[b + 1]));
+          copy.splice(b - 1, 3, this.fix(flottant, lst[b - 1] / lst[b + 1]));
         } else {
-          copy.splice(a - 1, 3, this.fix(floattant, lst[a - 1] * lst[a + 1]));
+          copy.splice(a - 1, 3, this.fix(flottant, lst[a - 1] * lst[a + 1]));
         }
       } else if (a >= 1) {
-        copy.splice(a - 1, 3, this.fix(floattant, lst[a - 1] * lst[a + 1]));
+        copy.splice(a - 1, 3, this.fix(flottant, lst[a - 1] * lst[a + 1]));
       } else if (b >= 1) {
-        copy.splice(b - 1, 3, this.fix(floattant, lst[b - 1] / lst[b + 1]));
+        copy.splice(b - 1, 3, this.fix(flottant, lst[b - 1] / lst[b + 1]));
       }
       i++;
       if (i > this.numberMax) {
@@ -158,14 +158,14 @@ class CalculatorModel extends WidgetModel {
       }
       if (a >= 1 && b >= 1) {
         if (a > b) {
-          copy.splice(b - 1, 3, this.fix(floattant, lst[b - 1] - lst[b + 1]));
+          copy.splice(b - 1, 3, this.fix(flottant, lst[b - 1] - lst[b + 1]));
         } else {
-          copy.splice(a - 1, 3, this.fix(floattant, lst[a - 1] + lst[a + 1]));
+          copy.splice(a - 1, 3, this.fix(flottant, lst[a - 1] + lst[a + 1]));
         }
       } else if (a >= 1) {
-        copy.splice(a - 1, 3, this.fix(floattant, lst[a - 1] + lst[a + 1]));
+        copy.splice(a - 1, 3, this.fix(flottant, lst[a - 1] + lst[a + 1]));
       } else if (b >= 1) {
-        copy.splice(b - 1, 3, this.fix(floattant, lst[b - 1] - lst[b + 1]));
+        copy.splice(b - 1, 3, this.fix(flottant, lst[b - 1] - lst[b + 1]));
       }
       i++;
       if (i > this.numberMax) {
@@ -239,7 +239,7 @@ class CalculatorModel extends WidgetModel {
         this.history.push(a.toString());
         arg.display.textContent = a;
       } else if (typeof a === "string") arg.display.textContent = a;
-      else a = error("SyntaxError : GR");
+      else a = this.error("SyntaxError : GR");
     }
     this.hIndex = this.history.length - 1;
   }
