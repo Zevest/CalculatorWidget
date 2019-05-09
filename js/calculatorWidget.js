@@ -27,13 +27,27 @@ class CalculatorModel extends WidgetModel {
     super.setUp();
 
   }
-  // Return msg and set error state to true
+
+  /**
+   * @methos error: Return msg and set error state to true
+   *
+   * @param {string} msg error message
+   * 
+   * @return {string} error message
+   */
   error(msg) {
     this.errored = true;
     console.error(msg);
     return msg;
   }
-  // Get order of queryParenthesis
+
+  /**
+   * @method queryParenthesis: Get order of Parenthesis
+   *
+   * @param {Array} lst Description
+   *
+   * @return {Array} pairs of parenthesis index
+   */
   queryParenthesis(lst) {
     let r = [];
     let index = [];
@@ -43,7 +57,6 @@ class CalculatorModel extends WidgetModel {
       count[1] = (lst[i] == ")") ? count[1] + 1 : count[1];
     }
     if (count[0] != count[1]) return this.error("SyntaxError : QP");
-
     for (let i = 0; i < lst.length; i++) {
       if (lst[i] == "(") {
         index.push(i);
@@ -54,11 +67,24 @@ class CalculatorModel extends WidgetModel {
     }
     return r;
   }
-  // Return true if it a is a number or use to describe a number
+  /**
+   * @method usedForNumber: Return true if it is a number or use to describe a number
+   *
+   * @param {string|Number} a Description
+   *
+   * @return {boolean}
+   */
   usedForNumber(a) {
     return a == parseFloat(a) || a === "." || a === "-";
   }
-  // Convert String expretion into list splitting number symbol of operation
+
+  /**
+   * @method parseExpr: Convert String expretion into list splitting number symbol of operation
+   *
+   * @param {string} expr: Mathematical expression
+   *
+   * @return {Array}
+   */
   parseExpr(expr) {
     let t = [""],
       index = 0, // number
@@ -101,9 +127,16 @@ class CalculatorModel extends WidgetModel {
     t.push(")");
     return t;
   }
-  // Calculate short expretion
+
+  /**
+   * @method calculate: Calculate short expression stored and parsed in array
+   *
+   * @param {Array} lst: parsed mathematical expression
+   *
+   * @return {string|Array} result or error message
+   */
   calculate(lst) {
-  	let flottant = 10
+    let flottant = 10
     console.log(lst);
     let copy = lst;
     if (lst[1] === ")") {
@@ -172,10 +205,17 @@ class CalculatorModel extends WidgetModel {
         return this.error("Error: too much operation");
       }
     }
-    console.log(copy);
     return copy[1];
   }
-  // Apply the calculation function using the correct order of operation
+
+  /**
+   * @method evaluate: Apply the calculation function using the correct order of operation
+   *
+   * @param {Element} arg: HTML input
+   * @param {Array|string} lst: parsed mathematical expression or error message
+   *
+   * @return {Array} result
+   */
   evaluate(arg, lst) {
     if (typeof lst == "string") {
       arg.display.textContent = lst;
@@ -197,19 +237,17 @@ class CalculatorModel extends WidgetModel {
           i++;
         }
       }
-	  if(copy[i] == "%" && i > 1){
-  	    if (!(copy[i + 1] == "+" || copy[i + 1] == "-" || copy[i + 1] == "*" || copy[i + 1] == "/" || copy[i + 1] == ")")) {
-      	   copy.splice(i, 1, "/"); 
-      	   copy.splice(i+1, 0, 100);
-      	   copy.splice(i+2, 0, "*");
-      	   i+=3;
+      if (copy[i] == "%" && i > 1) {
+        if (!(copy[i + 1] == "+" || copy[i + 1] == "-" || copy[i + 1] == "*" || copy[i + 1] == "/" || copy[i + 1] == ")")) {
+          copy.splice(i, 1, "/");
+          copy.splice(i + 1, 0, 100);
+          copy.splice(i + 2, 0, "*");
+          i += 3;
         }
       }
       i++;
     }
-
     let step = this.queryParenthesis(copy).length;
-
     for (let i = 0; i < step; i++) {
       let par = this.queryParenthesis(copy);
       if (typeof par == "string") return par;
@@ -219,14 +257,28 @@ class CalculatorModel extends WidgetModel {
     }
     return copy[0];
   }
-  // query result
-  fix(n, val){
-  	let t = Math.pow(10,n);
-  	let res = val * t;
-  	res = Math.round(res);
-  	return res/t;
-  	
+
+  /**
+   * @method fix: truncation to the nth digit after the decimal point
+   *
+   * @param {Number} n: number of digit after decimal point
+   * @param {Number} val: Value to truncate
+   *
+   * @return {Number} result
+   */
+  fix(n, val) {
+    let t = Math.pow(10, n);
+    let res = val * t;
+    res = Math.round(res);
+    return res / t;
+
   }
+
+  /**
+   * @method getResult: query result
+   *
+   * @param {Element} arg: HTML input
+   */
   getResult(arg) {
     if (this.errored) {
       arg.display.textContent = "";
@@ -243,12 +295,22 @@ class CalculatorModel extends WidgetModel {
     }
     this.hIndex = this.history.length - 1;
   }
-  // Add value to memory
+
+  /**
+   * @method memoryAdd: Add value to memory
+   *
+   * @param {array} val: parsed mathematical expression
+   */
   memoryAdd(val) {
     let a = this.evaluate(null, this.parseExpr(val));
     if (!isNaN(a)) this.memory += a;
   }
-  // Subtract value from memory
+
+  /**
+   * @method memoryAdd: Subtract value from memory
+   *
+   * @param {array} val: parsed mathematical expression
+   */
   memorySub(val) {
     let a = this.evaluate(null, this.parseExpr(val));
     if (!isNaN(a)) this.memory -= a;
@@ -284,7 +346,10 @@ class CalculatorView extends WidgetView {
     this.createAllButton();
     this.showButton();
   }
-  // Create all necessary button
+
+  /**
+   * @method createAllButton: Create all necessary button
+   */
   createAllButton() {
     this.buttonFactory('mc', event => (this.memoryClear(this)), null, [1.25]);
     this.buttonFactory('m+', event => (this.memoryAdd(this)), null, [1.25]);
@@ -315,13 +380,27 @@ class CalculatorView extends WidgetView {
     this.buttonFactory(",", this.add, [this, "."]);
     this.buttonFactory('=', event => (this.calc(this)), null, [2, 1]);
   }
-  // Add all button from list to stage
+
+
+  /**
+   * @method showButton: Add all button from list to stage
+   */
   showButton() {
     for (let i = 0; i < this.buttons.length; i++) {
       this.stage.appendChild(this.buttons[i]);
     }
   }
-  // Add button to list
+
+  //
+
+  /**
+   * @method buttonFactory: Add button to list
+   *
+   * @param {string} name: text displayed on the button
+   * @param {function} func: function onClick event
+   * @param {string|Number} val: argument to the function
+   * @param {array} dim: Dimension of the buttons
+   */
   buttonFactory(name, func, val, dim = [1, 1]) {
     let b = HH.create("div");
     b.textContent = name;
@@ -338,11 +417,22 @@ class CalculatorView extends WidgetView {
     });
     this.buttons.push(b);
   }
-  // Request error state from controller
+
+  /**
+   * @method errored: Request error state from controller
+   *
+   * @return {string} error message
+   */
   errored() {
     return this.mvc.controller.errored();
   }
-  // Request Error state before adding character
+
+  /**
+   * @method add: Request Error state before adding character to text input
+   *
+   * @param {event} event
+   * @param {Array} arg:  [this, value], value: string
+   */
   add(event, arg) {
     if (arg[0].errored()) {
       arg[0].mvc.controller.setError(false);
@@ -352,7 +442,12 @@ class CalculatorView extends WidgetView {
     arg[0].mvc.controller.setIndex();
     arg[0].display.scrollTo(arg[0].display.textContent.length * 20, 0);
   }
-  // Delete last character
+
+  /**
+   * @method del: Delete last character of text input
+   *
+   * @param {Object} arg: this WidgetView
+   */
   del(arg) {
     if (arg.errored()) arg.display.textContent = "";
     let res = "";
@@ -360,32 +455,68 @@ class CalculatorView extends WidgetView {
     arg.display.textContent = res;
     this.mvc.controller.setIndex();
   }
-  // Delete all character
+
+  /**
+   * @method rm: Delete all character for text input
+   *
+   * @param {Object} arg: this WidgetView
+   */
   rm(arg) {
     arg.display.textContent = "";
     this.mvc.controller.setIndex();
   }
-  // Request result from controller
+
+  /**
+   * @methods calc: Request result from controller
+   *
+   * @param {Object} arg: this WidgetView
+   */
   calc(arg) {
     this.mvc.controller.getResult(arg);
   }
-  // Request history index update from controller
+
+  /**
+   * @method updateIndex: Request history index update from controller
+   *
+   * @param {Number} w: index increment value
+   */
   updateIndex(w) {
     this.mvc.controller.updateHIndex(w)
   }
-  // Request a memory clear from controller
+
+  /**
+   * @method memoryClear - Request a memory clear from controller
+   *
+   * @param {Object} arg: this WidgetView
+   */
   memoryClear(arg) {
     arg.mvc.controller.memoryClear(arg);
   }
-  // Request a memory addition from controller
+
+  /**
+   * @method memoryAdd: Request a memory addition from controller
+   *
+   * @param {Object} arg: this WidgetView
+   */
   memoryAdd(arg) {
     arg.mvc.controller.memoryAdd(arg);
   }
-  // Request a memory subtraction from controller
+
+  /**
+   * @method memorySub - Request a memory subtraction from controller
+   *
+   * @param {Object} arg: this WidgetView
+   */
   memorySub(arg) {
     arg.mvc.controller.memorySub(arg);
   }
-  // Request a memory stored value
+
+
+  /**
+   * @method memoryShow: Request a memory stored value
+   *
+   * @param {Object} arg: this WidgetView
+   */
   memoryShow(arg) {
     arg.mvc.controller.memoryShow(arg);
   }
@@ -400,46 +531,96 @@ class CalculatorController extends WidgetController {
   setUp() {
     super.setUp();
   }
-  // Update view
+
+  /**
+   * @method setField: Change the text input textContent
+   *
+   * @param {String} val new Value
+   */
   setField(val) {
     this.mvc.view.display.textContent = val;
   }
-  // Request result from model
+
+  /**
+   * @method getResult: Request result from model
+   *
+   * @param {Object} arg: this WidgetController
+   *
+   * @return {String|Array} Error message or result
+   */
   getResult(arg) {
     return this.mvc.model.getResult(arg);
   }
-  // Change history index, set by default to the last index
+
+
+  /**
+   * @method setIndex: Change history index, set by default to the last index
+   *
+   * @param {Number} w: next Value of model index
+   */
   setIndex(w = this.mvc.model.history.length) {
     this.mvc.model.hIndex = w;
   }
-  // Update history index
+
+  /**
+   * @method updateHIndex: Update history index
+   *
+   * @param {number} w index increment value
+   */
   updateHIndex(w) {
     this.mvc.model.hIndex += w;
     this.setIndex((this.mvc.model.hIndex > this.mvc.model.history.length) ? this.mvc.model.history.length : this.mvc.model.hIndex);
     this.mvc.model.hIndex = (this.mvc.model.hIndex < 0) ? 0 : this.mvc.model.hIndex;
     this.setField(this.mvc.model.history[this.mvc.model.hIndex]);
   }
-  // Return model's error state
+
+  /**
+   * @method errored: Get model's error state
+   *
+   * @return {boolean} Sate of model's errored
+   */
   errored() {
     return this.mvc.model.errored;
   }
-  // Set model's error state
+
+  /**
+   * @method setError: Set model's error state
+   *
+   * @param {boolean} state: Next state of model's errored
+   */
   setError(state) {
     this.mvc.model.errored = state;
   }
-  // Clear model's memory by resetting it to 0
+
+  /**
+   * @method memoryClear: Clear model's memory by resetting it to 0
+   */
   memoryClear() {
     this.mvc.model.memory = 0;
   }
-  // Request a memory addition from model
+
+
+  /**
+   * @method memoryAdd: Request a memory addition from model
+   *
+   * @param {Object} arg: this WidgetController
+   */
   memoryAdd(arg) {
     this.mvc.model.memoryAdd(arg.display.textContent);
   }
-  // Request a memory subtraction from model
+
+  /**
+   * @method memorySub: Request a memory subtraction from model
+   *
+   * @param {Object} arg: this WidgetController
+   */
   memorySub(arg) {
     this.mvc.model.memorySub(arg.display.textContent);
   }
-  // Show memory stored value on display
+
+  /**
+   * @method memoryShow: Show memory stored value on display
+   */
   memoryShow() {
     this.setField(this.mvc.model.memory);
   }
